@@ -28,19 +28,13 @@ export class CdkEcsStack extends cdk.Stack {
     })
     cluster.addAutoScalingGroup(autoScalingGroup)
 
-    const scheduledECS = new ecsp.ScheduledEc2Task(this, prefix + 'scheduled-task', {
+    new ecsp.ScheduledEc2Task(this, prefix + 'scheduled-task', {
       cluster,
       scheduledEc2TaskImageOptions: {
         image: ecs.ContainerImage.fromEcrRepository(ecr.Repository.fromRepositoryName(this, 'ecs-test', 'ecs-test')),
         memoryLimitMiB: 300
       },
       schedule: events.Schedule.expression('rate(2 minutes)')
-    })
-
-    //サービスの定義不要？
-    new ecs.Ec2Service(this, prefix + 'service', {
-      cluster: scheduledECS.cluster,
-      taskDefinition: scheduledECS.taskDefinition
     })
   }
 }
