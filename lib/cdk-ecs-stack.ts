@@ -32,7 +32,18 @@ export class CdkEcsStack extends cdk.Stack {
       cluster,
       scheduledEc2TaskImageOptions: {
         image: ecs.ContainerImage.fromEcrRepository(ecr.Repository.fromRepositoryName(this, 'ecs-test', 'ecs-test')),
-        memoryLimitMiB: 300
+        memoryLimitMiB: 300,
+        // FireLensのログ設定
+        logDriver:ecs.LogDrivers.firelens({
+          options: {
+            Name: 'cloudwatch',
+            region: this.region,
+            log_group_name: 'ecs-test',
+            auto_create_group: 'true',
+            log_stream_prefix: 'fromFireLens',
+            log_key: 'log'
+          }
+        })
       },
       schedule: events.Schedule.expression('rate(2 minutes)')
     })
